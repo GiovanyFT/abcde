@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.servicos.abcde.entidades.A;
 import com.servicos.abcde.repositorios.RepositorioA;
+import com.servicos.abcde.servicos.excecoes.ObjetoNaoEncontradoException;
 
 @Service
 public class ServicoA {
@@ -24,7 +25,7 @@ public class ServicoA {
 	
 	public A obterPorId(Long id) {
 		Optional<A> obj = repositorio.findById(id);
-		return obj.get();
+		return obj.orElseThrow(() -> new ObjetoNaoEncontradoException(id));
 	}
 	
 	public A inserir(A a) {
