@@ -1,13 +1,15 @@
 package com.servicos.abcde.servicos;
 
-import java.time.Instant;
+
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.servicos.abcde.entidades.A;
 import com.servicos.abcde.repositorios.RepositorioA;
 import com.servicos.abcde.servicos.excecoes.ObjetoNaoEncontradoException;
@@ -33,13 +35,22 @@ public class ServicoA {
 	}
 	
 	public void excluir(Long id) {
-		repositorio.deleteById(id);
+		try {
+			repositorio.deleteById(id);
+		} catch (EmptyResultDataAccessException e) {
+			throw new ObjetoNaoEncontradoException(id);
+		}
 	}
 	
 	public A update(Long id, A objeto_alterado) {
-		A a = repositorio.getById(id);
-		atualizarDados(a, objeto_alterado);
-		return repositorio.save(a);	
+		try {
+			A a = repositorio.getById(id);
+			atualizarDados(a, objeto_alterado);
+			return repositorio.save(a);	
+		}catch (EntityNotFoundException e) {
+			throw new ObjetoNaoEncontradoException(id);
+		}
+
 	}
 	
 	public void atualizarDados(A destino, A origem) {
